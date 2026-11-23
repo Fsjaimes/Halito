@@ -1,0 +1,20 @@
+services:
+  db:
+    # PostgreSQL 16 con TimescaleDB y PostGIS incluidos.
+    image: timescale/timescaledb-ha:pg16
+    environment:
+      POSTGRES_USER: ${HALITO_DB_USER:-halito}
+      POSTGRES_PASSWORD: ${HALITO_DB_PASSWORD:-halito_dev}
+      POSTGRES_DB: ${HALITO_DB_NAME:-halito}
+    ports:
+      - "127.0.0.1:${HALITO_DB_PORT:-5433}:5432"
+    volumes:
+      - db_data:/home/postgres/pgdata
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  db_data:

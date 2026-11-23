@@ -1,0 +1,24 @@
+# SITE_ADDRESS: el dominio (Caddy obtiene el certificado HTTPS solo) o «:80» en local.
+{$SITE_ADDRESS::80} {
+	encode zstd gzip
+
+	# La API vive en /api; se le quita el prefijo al reenviarla.
+	handle_path /api/* {
+		reverse_proxy api:8000
+	}
+
+	handle {
+		root * /srv
+		# Los archivos con hash en el nombre no cambian nunca: se guardan un año.
+		@hashed path /assets/*
+		header @hashed Cache-Control "public, max-age=31536000, immutable"
+		try_files {path} /index.html
+		file_server
+	}
+
+	header {
+		X-Content-Type-Options nosniff
+		Referrer-Policy strict-origin-when-cross-origin
+		-Server
+	}
+}

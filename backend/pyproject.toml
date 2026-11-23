@@ -1,0 +1,65 @@
+[project]
+name = "halito"
+version = "0.1.0"
+description = "Hálito: el calor y el aire del área metropolitana de Bucaramanga"
+readme = "README.md"
+authors = [
+    { name = "fsjaimes", email = "franchojaimes07@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "alembic>=1.20.1",
+    "fastapi>=0.163.1",
+    "h3>=4.5.0",
+    "httpx>=0.28.1",
+    "numpy>=2.5.5",
+    "planetary-computer>=1.0.0",
+    "polars[rtcompat]>=2.1.0",
+    "psycopg[binary]>=3.3.9",
+    "pydantic-settings>=2.16.3",
+    "pystac-client>=0.9.1",
+    "rasterio>=1.5.2",
+    "sqlalchemy[asyncio]>=2.1.9",
+    "typer>=0.29.1",
+    "uvicorn[standard]>=0.54.0",
+]
+
+
+[project.scripts]
+halito = "halito.cli:main"
+
+[build-system]
+requires = ["uv_build>=0.11.21,<0.12.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "httpx>=0.28.1",
+    "mypy>=2.4.1",
+    "pytest>=9.2.0",
+    "pytest-asyncio>=1.5.0",
+    "ruff>=0.17.5",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "ASYNC"]
+
+[tool.mypy]
+files = ["src", "tests"]
+strict = true
+plugins = ["pydantic.mypy"]
+
+[[tool.mypy.overrides]]
+# Librerías geoespaciales sin anotaciones de tipos.
+module = ["h3.*", "rasterio.*", "planetary_computer.*", "pystac_client.*"]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "session"
+asyncio_default_test_loop_scope = "session"
+testpaths = ["tests"]
